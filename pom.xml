@@ -7,6 +7,14 @@
             <updatePolicy>always</updatePolicy>
         </snapshots>
     </repository>
+     <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+    <id>com.teamdev</id>
+    <url>https://europe-maven.pkg.dev/jxbrowser/releases</url>
+</repository>
 </repositories>
   <modelVersion>4.0.0</modelVersion>
   <groupId>JavaiTextPDFExamples</groupId>
@@ -18,12 +26,68 @@
 		<artifactId>itextpdf</artifactId>
 		<version>5.0.6</version>
 	</dependency>
-	
+	<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.15.1</version>
+</dependency>
+	<dependency>
+    <groupId>com.github.Dansoftowner</groupId>
+    <artifactId>PDFViewerFX</artifactId>
+    <version>0.8</version>
+</dependency>
+	<dependency>
+    <groupId>com.teamdev.jxbrowser</groupId>
+    <artifactId>jxbrowser-cross-platform</artifactId>
+    <version>7.36.3</version>
+    <type>pom</type>
+</dependency>
+<dependency>
+    <groupId>com.teamdev.jxbrowser</groupId>
+    <artifactId>jxbrowser-javafx</artifactId>
+    <version>7.36.3</version>
+</dependency>
+
     <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-controls</artifactId>
-        <version>16</version> <!-- 请根据你的需求选择合适的版本 -->
+        <version>20.0.2</version> <!-- 请根据你的需求选择合适的版本 -->
     </dependency>
+    <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox</artifactId>
+        <version>2.0.3</version> <!-- 检查最新版本 -->
+    </dependency>
+    <dependency>
+        <groupId>org.apache.pdfbox</groupId>
+        <artifactId>pdfbox-tools</artifactId>
+        <version>2.0.3</version> <!-- 检查最新版本 -->
+    </dependency>
+    <dependency>
+        <groupId>com.jfoenix</groupId>
+        <artifactId>jfoenix</artifactId>
+        <version>9.0.10</version> <!-- Use the latest version available -->
+    </dependency>
+    <dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-web</artifactId>
+    <version>20.0.2</version>
+</dependency>
+<dependency>
+        <groupId>org.controlsfx</groupId>
+        <artifactId>controlsfx</artifactId>
+        <version>11.1.0</version> <!-- 使用最新版本 -->
+    </dependency>
+    <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>20.0.1</version>
+        </dependency>
+     <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>20.0.2</version>
+        </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
