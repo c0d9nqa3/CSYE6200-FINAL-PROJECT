@@ -41,3 +41,28 @@ public class Home {
     }
 }
 
+
+
+
+
+confirmButton.setOnAction(event -> {
+    String signature = signatureTextField.getText().trim();
+    if (signature.isEmpty()) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText(null);
+        alert.setContentText("Please enter your signature before confirming.");
+        alert.showAndWait();
+    } else {
+        // 更新 PDF 文件的签名
+        PDFGenerate pdfGenerator = new PDFGenerate();
+        try {
+            // 假设您已有其他所需参数
+            pdfGenerator.generatePDFFile("2023-01-01", "PA Name", "PB Name", "Contract Address", "Service Description", "Deadline", "Invoice Frequency", "Total Amount", "PB Person Name", "PA Person Name", "Contract Name", signature);
+            System.out.println("Confirmed with signature: " + signature);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+});
+
