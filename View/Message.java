@@ -10,18 +10,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Optional;
 
 public class Message {
-
-    private static final String URL = "jdbc:mysql://localhost:3306/contract";
-    private static final String USER = "root";
-    private static final String PASSWORD = "root";
-    private static final String QUERY = "SELECT contract_id, PA_name, contract_name FROM contract_relation WHERE status = 'inactive'";
 
     public static VBox getView() {
         VBox messagesLayout = new VBox(10);
@@ -30,27 +21,8 @@ public class Message {
         ListView<ContractData> messageList = new ListView<>();
         ObservableList<ContractData> items = FXCollections.observableArrayList();
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(QUERY)) {
-
-            while (rs.next()) {
-                items.add(new ContractData(
-                        rs.getInt("contract_id"),
-                        rs.getString("PA_name"),
-                        rs.getString("contract_name")
-                ));
-            }
-        } catch (Exception e) {
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Database Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Unable to load contracts from the database: " + e.getMessage());
-                alert.showAndWait();
-            });
-            e.printStackTrace();
-        }
+        // Load data from database using BUserDao
+        loadDataFromDatabase(items);
 
         messageList.setItems(items);
         messageList.setCellFactory(param -> new ContractListCell());
@@ -64,6 +36,22 @@ public class Message {
         messagesLayout.getChildren().add(messageList);
 
         return messagesLayout;
+    }
+
+    private static void loadDataFromDatabase(ObservableList<ContractData> data) {
+        BUserDao userDao = new BUserDao();
+        try {
+            userDao.getInactiveContractsForMessage(data);
+        } catch (Exception e) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Database Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Unable to load contracts from the database: " + e.getMessage());
+                alert.showAndWait();
+            });
+            e.printStackTrace();
+        }
     }
 
     private static void showContractDetails(ContractData contractData) {
@@ -127,5 +115,6 @@ public class Message {
                 setText(item.getContractName());
             }
         }
-    }
+    
+}
 }

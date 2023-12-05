@@ -16,22 +16,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import view.BUserDao;
+import java.sql.SQLException;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Optional;
+import java.util.Optional;;
 
 public class Contract {
-
-    private static final String URL = "jdbc:mysql://localhost:3306/contract";
-    private static final String USER = "root";
-    private static final String PASSWORD = "root";
-    private static final String QUERY = "SELECT * FROM contract_relation WHERE status = 'inactive'";
 
     public static VBox getView() {
         VBox vbox = new VBox();
@@ -99,29 +92,29 @@ public class Contract {
         table.getColumns().addAll(columnContractId, columnPAName, columnPBName, columnStatus, columnContractName, actionColumn);
 
         // Load data from database
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(QUERY)) {
-
-            while (rs.next()) {
-                data.add(new ContractData(
-                        rs.getInt("contract_id"),
-                        rs.getString("PA_name"),
-                        rs.getString("PB_name"),
-                        rs.getString("status"),
-                        rs.getString("contract_name")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        loadDataFromDatabase(data);
 
         table.setItems(data);
         vbox.getChildren().add(table);
 
         return vbox;
     }
-
+    
+    private static void loadDataFromDatabase(ObservableList<ContractData> data) {
+        BUserDao userDao = new BUserDao();
+        try {
+            userDao.getInactiveContracts(data);
+        } catch (SQLException e) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setTitle("Database Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Failed to load contract data: " + e.getMessage());
+                alert.showAndWait();
+            });
+            e.printStackTrace();
+        }
+    }
     private static void showViewDialog(ContractData data) {
         Platform.runLater(() -> {
             Stage viewStage = new Stage();
@@ -148,15 +141,12 @@ public class Contract {
     }
 
     private static void deleteContract(int contractId, TableView<ContractData> table) {
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
-
-            String sql = "DELETE FROM contract_relation WHERE contract_id = " + contractId;
-            int affectedRows = stmt.executeUpdate(sql);
-            if (affectedRows > 0) {
-                Platform.runLater(() -> table.getItems().removeIf(contract -> contract.getContractId() == contractId));
-            }
-        } catch (Exception e) {
+    	try {
+            BUserDao userDao = new BUserDao();
+            userDao.deleteContract(contractId);
+            Platform.runLater(() -> table.getItems().removeIf(contract -> contract.getContractId() == contractId));
+         
+    	} catch (Exception e) {
             Platform.runLater(() -> {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Error Dialog");
@@ -166,6 +156,8 @@ public class Contract {
             });
             e.printStackTrace();
         }
+    	
+    
     }
 
     public static class ContractData {

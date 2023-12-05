@@ -8,17 +8,10 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Alert;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import javafx.scene.control.Alert.AlertType;
+import view.BUserDao; // 确保导入 BUserDao 类
 
 public class Profile {
-
-    // 替换为你的数据库连接信息
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/userinfo";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
 
     public static VBox getView() {
         // 创建包含个人资料字段的GridPane
@@ -53,14 +46,23 @@ public class Profile {
 
         // 创建并配置应用按钮
         Button applyButton = new Button("Apply");
-        applyButton.setOnAction(event -> updateUserProfile(
-                nameField.getText(),
-                telField.getText(),
-                emailField.getText(),
-                moreInfoArea.getText(),
-                addressField.getText(),
-                1 // 这里应该是从登陆信息或者用户输入获取的用户ID
-        ));
+        applyButton.setOnAction(event -> {
+            try {
+                BUserDao userDao = new BUserDao();
+                userDao.updateUserProfile(
+                    nameField.getText(),
+                    telField.getText(),
+                    emailField.getText(),
+                    moreInfoArea.getText(),
+                    addressField.getText(),
+                    1 // 假设用户ID是已知的
+                );
+                showAlert(AlertType.INFORMATION, "Update successful.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(AlertType.ERROR, "Update failed. Error: " + e.getMessage());
+            }
+        });
 
         VBox layout = new VBox(10); // 主VBox布局
         layout.setPadding(new Insets(20));
@@ -69,32 +71,8 @@ public class Profile {
         return layout;
     }
 
-    private static void updateUserProfile(String name, String tel, String email, String more, String address, int userId) {
-        String sql = "UPDATE userinfo SET Name = ?, Tel = ?, Email = ?, More = ?, Address = ? WHERE UserID = ?";
-
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, name);
-            pstmt.setString(2, tel);
-            pstmt.setString(3, email);
-            pstmt.setString(4, more);
-            pstmt.setString(5, address);
-            pstmt.setInt(6, userId);
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Update successful.");
-                alert.showAndWait();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Update failed. No user found with the given ID.");
-                alert.showAndWait();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Update failed. Error: " + e.getMessage());
-            alert.showAndWait();
-        }
+    private static void showAlert(AlertType type, String message) {
+        Alert alert = new Alert(type, message);
+        alert.showAndWait();
     }
 }
-//假设ID是已知的
